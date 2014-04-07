@@ -8,7 +8,7 @@ for using `nfsadmin` as a commandline tool.
 Library usage
 -------------
 
-Using the library is easy: just `include 'nfsadmin'` in your own Ruby code.
+Using the library is easy: just `require 'nfsadmin'` in your own Ruby code.
 
 CLI usage
 ---------
