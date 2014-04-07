@@ -3,11 +3,11 @@ require File.join([File.dirname(__FILE__),'lib','nfsadmin','version.rb'])
 spec = Gem::Specification.new do |s| 
   s.name = 'nfsadmin'
   s.version = Nfsadmin::VERSION
-  s.author = 'Your Name Here'
-  s.email = 'your@email.address.com'
-  s.homepage = 'http://your.website.com'
+  s.author = 'Bastiaan Schaap'
+  s.email = 'b.schaap@siteminds.nl'
+  s.homepage = 'https://github.com/bjwschaap/nfsadmin'
   s.platform = Gem::Platform::RUBY
-  s.summary = 'A description of your project'
+  s.summary = 'This gem contains a library and CLI tool for managing the NFS service and exports'
   s.files = `git ls-files`.split("
 ")
   s.require_paths << 'lib'
