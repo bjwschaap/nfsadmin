@@ -1,6 +1,0 @@
-= nfsadmin
-
-Describe your project here
-
-:include:nfsadmin.rdoc
-
