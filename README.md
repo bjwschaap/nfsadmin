@@ -3,7 +3,7 @@ nfsadmin
 
 Nfsadmin is a Ruby Gem that allows for simple configuration of the NFS service and its exports.
 It consists of a library part that you can use in your own applications, and a CLI that allows 
-for using the `nfsadmin` tool.
+for using `nfsadmin` as a commandline tool.
 
 Library usage
 -------------
