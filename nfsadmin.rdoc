@@ -1,0 +1,5 @@
+= nfsadmin
+
+Generate this with
+    nfsadmin rdoc
+After you have described your command line interface
