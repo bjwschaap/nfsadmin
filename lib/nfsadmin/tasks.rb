@@ -2,9 +2,12 @@ module Nfsadmin
 
 	class Tasks
 		def self.list_shares
-			IO.popen(["/usr/sbin/exportfs", "-v"], :err=>[:child, :out]) do |io|
-			  output = io.read
-			  puts output
+			begin
+				IO.popen(["/usr/sbin/exportfs -v"], ) do |io|
+				  result = io.read
+				end
+			rescue
+				puts 'Error: nfsadmin requires the exportfs command to be present.'
 			end
 		end
 
