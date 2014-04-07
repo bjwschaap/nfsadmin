@@ -8,41 +8,73 @@ program_desc 'nfsadmin is a CLI to manage the NFS service and its exports'
 
 version Nfsadmin::VERSION
 
-desc 'Describe some switch here'
-switch [:s,:switch]
-
-desc 'Describe some flag here'
-default_value 'the default'
-arg_name 'The name of the argument'
-flag [:f,:flagname]
-
 desc 'The export command manages exported NFS shares'
-arg_name 'Describe arguments to export here'
 command :export do |c|
-  c.desc 'Describe a switch to export'
-  c.switch :s
-
-  c.desc 'Describe a flag to export'
-  c.default_value 'default'
-  c.flag :f
-  c.action do |global_options,options,args|
-
-    # Your command logic here
-     
-    # If you have any errors, just raise them
-    # raise "that command made no sense"
-
-    tasks = Nfsadmin::Tasks.new()
-    tasks.list_shares
+  
+  c.desc 'List all NFS exported shares on this server'
+  c.command :list do |list|
+    list.action do 
+      Nfsadmin::Tasks.list_shares
+    end
   end
+
+  c.desc 'Add a new NFS export to be shared on this server'
+  c.command :add do |add|
+    add.action do
+      Nfsadmin::Tasks.create_share
+    end
+  end
+
+  c.desc 'Delete an NFS export from this server'
+  c.command [:rm,:delete] do |delete|
+    delete.action do |global_options,options,args|
+      Nfsadmin::Tasks.delete_share
+    end
+  end
+    
+  c.default_command :list
 end
 
 desc 'The service command manages the NFS service'
 arg_name 'Describe arguments to service here'
 command :service do |c|
-  c.action do |global_options,options,args|
-    puts "service command ran"
+  
+  c.desc 'Return the status of the NFS service(s)'
+  c.command :status do |status|
+    status.action do |global_options,options,args|
+      Nfsadmin::Tasks.show_status
+    end
   end
+
+  c.desc 'Start the NFS service(s)'
+  c.command :start do |start|
+    start.action do |global_options,options,args|
+      Nfsadmin::Tasks.start_service
+    end
+  end
+
+  c.desc 'Stop the NFS service(s)'
+  c.command :stop do |stop|
+    stop.action do |global_options,options,args|
+      Nfsadmin::Tasks.stop_service
+    end
+  end
+
+  c.desc 'Restart the NFS service(s)'
+  c.command :start do |restart|
+    restart.action do |global_options,options,args|
+      Nfsadmin::Tasks.restart_service
+    end
+  end
+  
+  c.desc 'Reload the NFS exports configuration'
+  c.command :reload do |reload|
+    reload.action do |global_options,options,args|
+      Nfsadmin::Tasks.reload_config
+    end
+  end
+
+  c.default_command :status
 end
 
 pre do |global,command,options,args|
