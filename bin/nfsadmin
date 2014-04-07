@@ -10,10 +10,10 @@ version Nfsadmin::VERSION
 
 desc 'The export command manages exported NFS shares'
 command :export do |c|
-  
+
   c.desc 'List all NFS exported shares on this server'
   c.command :list do |list|
-    list.action do 
+    list.action do
       Nfsadmin::Tasks.list_shares
     end
   end
@@ -31,14 +31,14 @@ command :export do |c|
       Nfsadmin::Tasks.delete_share
     end
   end
-    
+
   c.default_command :list
 end
 
 desc 'The service command manages the NFS service'
 arg_name 'Describe arguments to service here'
 command :service do |c|
-  
+
   c.desc 'Return the status of the NFS service(s)'
   c.command :status do |status|
     status.action do |global_options,options,args|
@@ -66,7 +66,7 @@ command :service do |c|
       Nfsadmin::Tasks.restart_service
     end
   end
-  
+
   c.desc 'Reload the NFS exports configuration'
   c.command :reload do |reload|
     reload.action do |global_options,options,args|
