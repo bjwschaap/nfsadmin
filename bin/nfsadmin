@@ -13,8 +13,11 @@ command :export do |c|
 
   c.desc 'List all NFS exported shares on this server'
   c.command :list do |list|
-    list.action do
-      Nfsadmin::Tasks.list_shares
+    list.desc 'Define output type. Valid types are: text, json'
+    list.default_value 'text'
+    list.flag [:o, :output]
+    list.action do |global_options,options,args|
+      Nfsadmin::Tasks.list_shares(options[:o])
     end
   end
 

@@ -1,15 +1,56 @@
+require 'gli'
+require 'json'
+
 module Nfsadmin
 
   class Tasks
     def self.get_shares
-      IO.popen(["exportfs", "-v"], ) do |io|
-        return io.readlines
+      shares = []
+      mountpoint = ''
+      begin
+        file = File.open('/etc/exports', 'r')
+      rescue
+        raise GLI::CustomExit.new('No exports configuration could be found',-2)
       end
+      file.readlines.each do |line|
+        share = {}
+        acl = []
+        parts = line.split
+        parts.each do |part|
+          entry = {}
+          if (Pathname.new(part)).absolute?
+            mountpoint = part
+          else
+            subparts = part.split('(')
+            entry[:address] = subparts[0]
+            entry[:options] = subparts[1].sub!(/\)/, '')
+            acl << entry
+          end
+        end
+        share[:mountpoint] = mountpoint
+        share[:acl] = acl
+        shares << share
+      end
+      file.close
+      return shares
     end
 
-    def self.list_shares
+    def self.list_shares(output_type)
       exports = get_shares
-      puts "Found #{exports.size} shares"
+      if output_type == 'text'
+        # Output plain text
+        exports.each do |share|
+          printf('%-40s', share[:mountpoint])
+          share[:acl].each do |acl|
+            print acl[:address] + '(' + acl[:options] + ')' + ' '
+          end
+          print "\n"
+        end
+        STDOUT.flush
+      else
+        # Output JSON
+        puts JSON.generate({ :exports => exports })
+      end
     end
 
     def self.create_share
@@ -21,23 +62,23 @@ module Nfsadmin
     end
 
     def self.show_status
-      puts 'Show the status of the NFS service(s)'
+      `/usr/sbin/service nfs status`
     end
 
     def self.start_service
-      puts 'Start the NFS service(s)'
+      `/usr/sbin/service nfs start`
     end
 
     def self.stop_service
-      puts 'Stop the NFS service(s)'
+      `/usr/sbin/service nfs stop`
     end
 
     def self.restart_service
-      puts 'Restart the NFS service(s)'
+      `/usr/sbin/service nfd restart`
     end
 
     def self.reload_config
-      puts 'Reload the exported NFS shares'
+      `/usr/sbin/service nfs reload`
     end
   end
 
