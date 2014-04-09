@@ -4,9 +4,12 @@ require 'nfsadmin'
 
 include GLI::App
 
+subcommand_option_handling :normal
+
 program_desc 'nfsadmin is a CLI to manage the NFS service and its exports'
 
 version Nfsadmin::VERSION
+
 
 flag [:c,:config], :default_value => '/etc/exports'
 
@@ -42,6 +45,8 @@ command :export do |c|
 
   c.desc 'Delete an NFS export from this server'
   c.command [:rm,:delete] do |delete|
+    delete.desc 'The location of the share to delete'
+    delete.flag [:l, :location]
     delete.action do |global_options,options,args|
       Nfsadmin::Tasks.delete_share(global_options[:c], options[:l])
     end
