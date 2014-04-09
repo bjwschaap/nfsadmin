@@ -97,6 +97,9 @@ module Nfsadmin
     end
 
     def self.delete_share(exportsfile, location)
+      if location.nil?
+        fail 'Location must be specified with -l or --location='
+      end
       shares = get_shares(exportsfile)
       share = shares.find { |share| share[:location] == location }
       shares.delete(share)
