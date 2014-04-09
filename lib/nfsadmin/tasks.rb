@@ -1,16 +1,15 @@
-require 'gli'
 require 'json'
 
 module Nfsadmin
 
   class Tasks
-    def self.get_shares
+    def self.get_shares(exportsfile)
       shares = []
-      mountpoint = ''
+      location = ''
       begin
-        file = File.open('/etc/exports', 'r')
+        file = File.open(exportsfile, 'r')
       rescue
-        raise GLI::CustomExit.new('No exports configuration could be found',-2)
+        fail 'No exports configuration could be found'
       end
       file.readlines.each do |line|
         share = {}
@@ -19,7 +18,7 @@ module Nfsadmin
         parts.each do |part|
           entry = {}
           if (Pathname.new(part)).absolute?
-            mountpoint = part
+            location = part
           else
             subparts = part.split('(')
             entry[:address] = subparts[0]
@@ -27,7 +26,7 @@ module Nfsadmin
             acl << entry
           end
         end
-        share[:mountpoint] = mountpoint
+        share[:location] = location
         share[:acl] = acl
         shares << share
       end
@@ -35,12 +34,30 @@ module Nfsadmin
       return shares
     end
 
-    def self.list_shares(output_type)
-      exports = get_shares
+    def self.write_exports(exportsfile, exports)
+      begin
+        file = File.open(exportsfile, File::WRONLY|File::CREAT)
+        file.truncate(0)
+      rescue
+        fail "Could not write to exports configuration #{exportsfile}"
+      end
+      exports.each do |share|
+        file.print(share[:location] + '   ')
+        share[:acl].each do |acl|
+          file.print acl[:address].to_s + '(' + acl[:options].to_s + ')' + ' '
+        end
+        file.print "\n"
+      end
+      file.flush
+      file.close
+    end
+
+    def self.list_shares(exportsfile, output_type)
+      exports = get_shares(exportsfile)
       if output_type == 'text'
         # Output plain text
         exports.each do |share|
-          printf('%-40s', share[:mountpoint])
+          printf('%-40s', share[:location])
           share[:acl].each do |acl|
             print acl[:address] + '(' + acl[:options] + ')' + ' '
           end
@@ -53,12 +70,37 @@ module Nfsadmin
       end
     end
 
-    def self.create_share
-      puts 'Create a new NFS share'
+    def self.create_share(exportsfile, location, address, options)
+      if location.nil?
+        fail 'Location must be specified'
+      end
+      if address.nil?
+        fail 'Address must be specified'
+      end
+      if options.nil?
+        fail 'Options must be specified'
+      end
+      share = { :location => location,
+                :acl => [{
+                    :address => address,
+                    :options => options
+                }]
+      }
+      shares = get_shares(exportsfile)
+      existingshare = shares.find { |s| s[:location] == location }
+      if existingshare.nil?
+        shares << share
+        write_exports(exportsfile, shares)
+      else
+        puts 'Share already exists. Use nfsadmin export modify to change it. Skipping'
+      end
     end
 
-    def self.delete_share
-      puts 'Delete a NFS share'
+    def self.delete_share(exportsfile, location)
+      shares = get_shares(exportsfile)
+      share = shares.find { |share| share[:location] == location }
+      shares.delete(share)
+      write_exports(exportsfile, shares)
     end
 
     def self.show_status

@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     nfsadmin (0.0.1)
-      gli (= 2.9.0)
+      gli (~> 2.9)
 
 GEM
   remote: https://rubygems.org/
@@ -38,7 +38,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aruba
+  aruba (~> 0.5)
   nfsadmin!
-  rake
-  rdoc
+  rake (~> 10.2)
+  rdoc (~> 4.1)
