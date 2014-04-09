@@ -1,4 +1,5 @@
 require 'json'
+require 'fileutils'
 
 module Nfsadmin
 
@@ -72,7 +73,7 @@ module Nfsadmin
       end
     end
 
-    def self.create_share(exportsfile, location, address, options)
+    def self.create_share(exportsfile, location, address, options, createlocation)
       if location.nil?
         fail 'Location must be specified'
       end
@@ -81,6 +82,9 @@ module Nfsadmin
       end
       if options.nil?
         fail 'Options must be specified'
+      end
+      if createlocation
+        FileUtils::mkdir_p location unless File.directory?(location)
       end
       share = { :location => location,
                 :acl => [{
@@ -108,12 +112,19 @@ module Nfsadmin
       write_exports(exportsfile, shares)
     end
 
-    def self.get_share(exportsfile, location, output_type)
+    def self.get_share(exportsfile, location)
       if location.nil?
         fail 'Location must be specified with -l or --location='
       end
       shares = get_shares(exportsfile)
-      share = shares.find { |share| share[:location] == location }
+      shares.find { |share| share[:location] == location }
+    end
+
+    def self.print_share(exportsfile, location, output_type)
+      share = get_share(exportsfile, location)
+      if share.nil?
+        fail 'share not found'
+      end
       if output_type.downcase == 'text'
         printf('%-40s', share[:location])
         share[:acl].each do |acl|

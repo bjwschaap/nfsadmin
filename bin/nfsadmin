@@ -33,8 +33,10 @@ command :export do |c|
     add.flag [:a, :address]
     add.desc 'The NFS options for this share, e.g. rw,sync,no_root_squash,no_subtree_check'
     add.flag [:o, :options]
+    add.desc 'This option forces the location to be created'
+    add.switch [:c, :create]
     add.action do |global_options,options,args|
-      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o])
+      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o], options[:c])
     end
   end
 
@@ -48,7 +50,7 @@ command :export do |c|
   c.desc 'Get information about a specific share'
   c.command [:get] do |get|
     get.action do |global_options,options,args|
-      Nfsadmin::Tasks.get_share(global_options[:c], options[:l], options[:f])
+      Nfsadmin::Tasks.print_share(global_options[:c], options[:l], options[:f])
     end
   end
 end
