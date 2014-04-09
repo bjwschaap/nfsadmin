@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nfsadmin (0.0.1)
+    nfsadmin (0.0.2)
       gli (~> 2.9)
 
 GEM
