@@ -54,7 +54,7 @@ module Nfsadmin
 
     def self.list_shares(exportsfile, output_type)
       exports = get_shares(exportsfile)
-      if output_type == 'text'
+      if output_type.downcase == 'text'
         # Output plain text
         exports.each do |share|
           printf('%-40s', share[:location])
@@ -64,9 +64,11 @@ module Nfsadmin
           print "\n"
         end
         STDOUT.flush
-      else
+      elsif output_type.downcase == 'json'
         # Output JSON
         puts JSON.generate({ :exports => exports })
+      else
+        fail "#{output_type} is an invalid output format. Must one of: text, json"
       end
     end
 
@@ -104,6 +106,26 @@ module Nfsadmin
       share = shares.find { |share| share[:location] == location }
       shares.delete(share)
       write_exports(exportsfile, shares)
+    end
+
+    def self.get_share(exportsfile, location, output_type)
+      if location.nil?
+        fail 'Location must be specified with -l or --location='
+      end
+      shares = get_shares(exportsfile)
+      share = shares.find { |share| share[:location] == location }
+      if output_type.downcase == 'text'
+        printf('%-40s', share[:location])
+        share[:acl].each do |acl|
+          print acl[:address] + '(' + acl[:options] + ')' + ' '
+        end
+        print "\n"
+        STDOUT.flush
+      elsif output_type.downcase == 'json'
+        puts JSON.generate(share)
+      else
+        fail "#{output_type} is an invalid output format. Must one of: text, json"
+      end
     end
 
     def self.show_status

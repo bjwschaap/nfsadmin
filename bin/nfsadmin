@@ -13,6 +13,8 @@ flag [:c,:config], :default_value => '/etc/exports'
 desc 'The export command manages exported NFS shares'
 command :export do |c|
 
+  c.default_command :list
+
   c.desc 'List all NFS exported shares on this server'
   c.command :list do |list|
     list.desc 'Define output type. Valid types are: text, json'
@@ -43,7 +45,12 @@ command :export do |c|
     end
   end
 
-  c.default_command :list
+  c.desc 'Get information about a specific share'
+  c.command [:get] do |get|
+    get.action do |global_options,options,args|
+      Nfsadmin::Tasks.get_share(global_options[:c], options[:l], options[:f])
+    end
+  end
 end
 
 desc 'The service command manages the NFS service'
