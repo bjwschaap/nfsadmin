@@ -76,6 +76,8 @@ module Nfsadmin
     def self.create_share(exportsfile, location, address, options, createlocation)
       if location.nil?
         fail 'Location must be specified'
+      else
+        fail 'Location must be an absolute path' unless (Pathname.new(location)).absolute?
       end
       if address.nil?
         fail 'Address must be specified'
@@ -97,6 +99,7 @@ module Nfsadmin
       if existingshare.nil?
         shares << share
         write_exports(exportsfile, shares)
+        puts 'Share created'
       else
         puts 'Share already exists. Use nfsadmin export modify to change it. Skipping'
       end
@@ -108,8 +111,13 @@ module Nfsadmin
       end
       shares = get_shares(exportsfile)
       share = shares.find { |share| share[:location] == location }
-      shares.delete(share)
-      write_exports(exportsfile, shares)
+      if share.nil?
+        fail "#{location} not found"
+      else
+        shares.delete(share)
+        write_exports(exportsfile, shares)
+        puts "Deleted #{location}"
+      end
     end
 
     def self.get_share(exportsfile, location)
