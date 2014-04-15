@@ -4,6 +4,18 @@ require 'fileutils'
 module Nfsadmin
 
   class Tasks
+
+    @service_cmd = ''
+
+    begin
+      file = File.new('/usr/sbin/service')
+      @service_cmd = '/usr/sbin/service'
+    rescue
+      file = File.new('/sbin/service')
+      @service_cmd = '/sbin/service'
+    end
+
+
     def self.get_shares(exportsfile)
       shares = []
       location = ''
@@ -148,23 +160,23 @@ module Nfsadmin
     end
 
     def self.show_status
-      `/usr/sbin/service nfs status`
+      system "#{@service_cmd} nfs status"
     end
 
     def self.start_service
-      `/usr/sbin/service nfs start`
+      system "#{@service_cmd} nfs start"
     end
 
     def self.stop_service
-      `/usr/sbin/service nfs stop`
+      system "#{@service_cmd} nfs stop"
     end
 
     def self.restart_service
-      `/usr/sbin/service nfd restart`
+      system "#{@service_cmd} nfs restart"
     end
 
     def self.reload_config
-      `/usr/sbin/service nfs reload`
+      system "#{@service_cmd} nfs reload"
     end
   end
 
