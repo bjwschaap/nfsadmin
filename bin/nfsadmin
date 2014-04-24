@@ -38,8 +38,12 @@ command :export do |c|
     add.flag [:o, :options]
     add.desc 'This option forces the location to be created'
     add.switch [:c, :create]
+    add.desc 'OS user that should own the created location'
+    add.flag [:u, :user]
+    add.desc 'OS group that should own the created location'
+    add.flag [:g, :group]
     add.action do |global_options,options,args|
-      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o], options[:c])
+      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o], options[:c], options[:u], options[:g])
     end
   end
 
