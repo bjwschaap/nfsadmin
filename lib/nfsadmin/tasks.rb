@@ -85,7 +85,7 @@ module Nfsadmin
       end
     end
 
-    def self.create_share(exportsfile, location, address, options, createlocation, user, group)
+    def self.create_share(exportsfile, location, address, options, createlocation, user, group, mode)
       if location.nil?
         fail 'Location must be specified'
       else
@@ -99,7 +99,9 @@ module Nfsadmin
       end
       if createlocation
         FileUtils::mkdir_p location unless File.directory?(location)
-        FileUtils::chown user, group, location unless user.nil? or group.nil?
+        FileUtils::chown user, nil, location unless user.nil?
+        FileUtils::chown nil, group, location unless group.nil?
+        FileUtils::chmod mode, location unless mode.nil?
       end
       share = { :location => location,
                 :acl => [{

@@ -42,8 +42,10 @@ command :export do |c|
     add.flag [:u, :user]
     add.desc 'OS group that should own the created location'
     add.flag [:g, :group]
+    add.desc 'Mode of the created location (permissions in written form, e.g. u=wrx,go=rx)'
+    add.flag [:m, :mode]
     add.action do |global_options,options,args|
-      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o], options[:c], options[:u], options[:g])
+      Nfsadmin::Tasks.create_share(global_options[:c], options[:l], options[:a], options[:o], options[:c], options[:u], options[:g], options[:m])
     end
   end
 
