@@ -1,5 +1,6 @@
 require 'json'
 require 'fileutils'
+require 'etc'
 
 module Nfsadmin
 
@@ -39,7 +40,11 @@ module Nfsadmin
             acl << entry
           end
         end
+        stat = File.stat(location)
         share[:location] = location
+        share[:owner] = Etc.getpwuid(stat.uid).name
+        share[:group] = Etc.getgrgid(stat.gid).name
+        share[:mode] = stat.mode.to_s(8)[-3,3]
         share[:acl] = acl
         shares << share
       end
@@ -74,7 +79,9 @@ module Nfsadmin
           share[:acl].each do |acl|
             print acl[:address] + '(' + acl[:options] + ')' + ' '
           end
-          print "\n"
+          print(share[:owner]) unless share[:owner].nil?
+          print(':' + share[:group] + ' ') unless share[:group].nil?
+          print(share[:mode] + "\n")
         end
         STDOUT.flush
       elsif output_type.downcase == 'json'
